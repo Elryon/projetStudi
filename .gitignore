@@ -1,6 +1,7 @@
 
 ###> symfony/framework-bundle ###
-/.env.local
+.env
+.env.local
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
@@ -23,3 +24,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> symfonycasts/sass-bundle ###
+/public/assets/
+###< symfonycasts/sass-bundle ###
