@@ -25,6 +25,7 @@ class ChangePasswordFormType extends AbstractType
                     ],
                 ],
                 'first_options' => [
+                    'trim' => true,
                     'constraints' => [
                         new NotBlank(
                             message: 'Veuillez entrer un mot de passe.',

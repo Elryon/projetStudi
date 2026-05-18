@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un plat{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Ajouter un nouveau plat</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.nom) }}
+            {{ form_row(registrationForm.photo) }}
+            {{ form_row(registrationForm.allergenes) }}
+            <button type="submit" class="btn btn-success mt-3">Créer le plat</button>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}

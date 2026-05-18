@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Menus{% endblock %}
+
+{% block body %}
+    {% if menus is empty %}
+        <div class="text-center py-5 text-muted">
+            <p class="fs-5">Aucun menu pour le moment.</p>
+        </div>
+    {% else %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for menu in menus %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ menu.titre }}</h5>
+                            <p class="text-muted small">{{ menu.description }}</p>
+
+                            <ul class="list-unstyled small mb-2">
+                                <li><strong>Min. personnes :</strong> {{ menu.personneMin }}</li>
+                                <li><strong>Prix :</strong> {{ menu.prixPersonne }} € / pers.</li>
+                            </ul>
+
+                            {% if menu.regime %}
+                                <span class="badge bg-info text-dark">{{ menu.regime.nom }}</span>
+                            {% endif %}
+                            {% if menu.theme %}
+                                <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0 text-end">
+                            <a href="{{ path('app_details_menu', {id: menu.id}) }}" class="btn btn-outline-primary btn-sm">
+                                Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

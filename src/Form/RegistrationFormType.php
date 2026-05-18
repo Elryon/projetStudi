@@ -24,6 +24,7 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre nom.']),
                     new Length([
@@ -34,6 +35,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('prenom', TextType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre prénom.']),
                     new Length([
@@ -44,6 +46,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => "L'adresse mail est obligatoire."]),
                     new Email(['message' => "L'adresse mail est invalide."]),
@@ -51,6 +54,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('telephone', TextType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre numéro de téléphone.']),
                     new Length([
@@ -61,12 +65,14 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('ville', TextType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre ville.']),
                 ]
             ])
             ->add('adresse', TextType::class, [
                 'required' => false,
+                'trim' => true,
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre adresse.']),
                 ]
@@ -80,6 +86,7 @@ class RegistrationFormType extends AbstractType
                     'attr' => ['autocomplete' => 'new-password'],
                     'help' => 'Votre mot de passe doit faire au moins 10 caractères et contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.',
                     'label' => 'Mot de passe',
+                    'trim' => true,
                     'constraints' => [
                         new NotBlank(
                             message: 'Veuillez entrer un mot de passe.',

@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ menu.titre }}{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h1 class="h3">{{ menu.titre }}</h1>
+                </div>
+
+                <p class="text-muted">{{ menu.description }}</p>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <strong>Prix par personne :</strong> {{ menu.prixPersonne }} €
+                    </div>
+                    <div class="col-sm-4">
+                        <strong>Min. personnes :</strong> {{ menu.personneMin }}
+                    </div>
+                </div>
+
+                {% if menu.regime %}
+                    <span class="badge bg-info text-dark me-1">{{ menu.regime.nom }}</span>
+                {% endif %}
+                {% if menu.theme %}
+                    <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="h4 mb-3">Plats du menu ({{ menu.plats|length }})</h2>
+
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for plat in menu.plats %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        {% if plat.photo %}
+                            <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}" 
+                                class="card-img-top" 
+                                alt="Photo de {{ plat.nom }}"
+                                style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <span class="text-muted">Pas de photo</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">{{ plat.nom }}</h5>
+                                {% if plat.disponible %}
+                                    <span class="badge bg-success">Disponible</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Indisponible</span>
+                                {% endif %}
+                            </div>
+
+                            {% if plat.allergenes %}
+                                <p class="text-muted small mb-0">Allergènes : {{ plat.allergenes }}</p>
+                            {% else %}
+                                <p class="text-muted small mb-0">Aucun allergène</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+{% endblock %}

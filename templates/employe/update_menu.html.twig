@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un menu{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Modifier le menu</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        {{ form_start(menuForm) }}
+            {{ form_row(menuForm.titre) }}
+            {{ form_row(menuForm.description) }}
+            {{ form_row(menuForm.prix_personne) }}
+            {{ form_row(menuForm.personne_min) }}
+            {{ form_row(menuForm.quantite_restante) }}
+            {{ form_row(menuForm.regime) }}
+            {{ form_row(menuForm.theme) }}
+            {{ form_row(menuForm.plats) }}
+            <button type="submit" class="btn btn-primary mt-3">Modifier le menu</button>
+        {{ form_end(menuForm) }}
+    </div>
+{% endblock %}

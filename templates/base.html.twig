@@ -28,20 +28,25 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
+                            <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link" href="#">Menus</a>
+                            <a class="nav-link" href="{{ path('app_menus') }}">Menus</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
+                            <a class="nav-link" href="#">Contact</a>
                         </li>
+                        {% if is_granted('ROLE_EMPLOYE') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_employe') }}">Espace employé</a>
+                            </li>
+                        {% endif %}
                     </ul>
                     {% if app.user %}
-                        <a class="btn btn-outline-success" href="{{ path('app_user') }}">Mon compte</a>
-                        <a class="btn btn-outline-success" href="{{ path('app_logout') }}">Déconnexion</a>
+                        <a class="btn btn-primary" href="{{ path('app_user') }}">Mon compte</a>
+                        <a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
                     {% else %}
-                        <a class="btn btn-outline-success" href="{{ path('app_login') }}">Connexion</a>
+                        <a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
                     {% endif %}
                 </div>
             </div>

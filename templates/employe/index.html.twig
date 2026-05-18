@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace employé{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        {# ===== SECTION PLATS ===== #}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Gestion des plats</h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePlats" aria-expanded="true" aria-controls="collapsePlats">
+                    Afficher / Masquer
+                </button>
+                <a class="btn btn-success" href="{{ path('app_nouveau_plat') }}">
+                    + Ajouter un plat
+                </a>
+            </div>
+        </div>
+
+        <div class="collapse show" id="collapsePlats">
+            {% if plats is empty %}
+                <div class="text-center py-5 text-muted">
+                    <p class="fs-5">Aucun plat pour le moment.</p>
+                    <a href="{{ path('app_nouveau_plat') }}" class="btn btn-outline-success">Créer votre premier plat</a>
+                </div>
+            {% else %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for plat in plats %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                {% if plat.photo %}
+                                    <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}" 
+                                        class="card-img-top" 
+                                        alt="Photo de {{ plat.nom }}"
+                                        style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <span class="text-muted">Pas de photo</span>
+                                    </div>
+                                {% endif %}
+
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">{{ plat.nom }}</h5>
+                                        {% if plat.disponible %}
+                                            <span class="badge bg-success">Disponible</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Indisponible</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if plat.allergenes %}
+                                        <p class="text-muted small mb-0">
+                                            Allergènes : {{ plat.allergenes }}
+                                        </p>
+                                    {% else %}
+                                        <p class="text-muted small mb-0">Aucun allergène</p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="card-footer bg-transparent border-top-0 text-end">
+                                    <a href="{{ path('app_update_plat', {id: plat.id}) }}" class="btn btn-outline-primary btn-sm">
+                                        Modifier
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <hr class="my-5">
+
+        {# ===== SECTION MENUS ===== #}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Gestion des menus</h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMenus" aria-expanded="true" aria-controls="collapseMenus">
+                    Afficher / Masquer
+                </button>
+                <a class="btn btn-success" href="{{ path('app_nouveau_menu') }}">
+                    + Ajouter un menu
+                </a>
+            </div>
+        </div>
+
+        <div class="collapse show" id="collapseMenus">
+            {% if menus is empty %}
+                <div class="text-center py-5 text-muted">
+                    <p class="fs-5">Aucun menu pour le moment.</p>
+                    <a href="{{ path('app_nouveau_menu') }}" class="btn btn-outline-success">Créer votre premier menu</a>
+                </div>
+            {% else %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for menu in menus %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ menu.titre }}</h5>
+                                    <p class="text-muted small">{{ menu.description }}</p>
+
+                                    <ul class="list-unstyled small mb-2">
+                                        <li><strong>Prix :</strong> {{ menu.prixPersonne }} € / pers.</li>
+                                        <li><strong>Min. personnes :</strong> {{ menu.personneMin }}</li>
+                                        <li><strong>Quantité restante :</strong> {{ menu.quantiteRestante }}</li>
+                                    </ul>
+
+                                    {% if menu.regime %}
+                                        <span class="badge bg-info text-dark">{{ menu.regime.nom }}</span>
+                                    {% endif %}
+                                    {% if menu.theme %}
+                                        <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
+                                    {% endif %}
+
+                                    {% if menu.plats is not empty %}
+                                        <p class="mt-2 mb-0 small"><strong>Plats :</strong>
+                                            {% for plat in menu.plats %}
+                                                {{ plat.nom }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="card-footer bg-transparent border-top-0 text-end">
+                                    <a href="{{ path('app_update_menu', {id: menu.id}) }}" class="btn btn-outline-primary btn-sm">
+                                        Modifier
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <hr class="my-5">
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Régimes</h4>
+                {{ form_start(regimeForm) }}
+                    <div class="input-group mb-3">
+                        {{ form_widget(regimeForm.nom, {attr: {class: 'form-control'}}) }}
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
+                {{ form_end(regimeForm) }}
+                {% for regime in regimes %}
+                    <span class="badge bg-info text-dark me-1">
+                        {{ regime.nom }}
+                    </span>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-6">
+                <h4>Thèmes</h4>
+                {{ form_start(themeForm) }}
+                    <div class="input-group mb-3">
+                        {{ form_widget(themeForm.theme, {attr: {class: 'form-control'}}) }}
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
+                {{ form_end(themeForm) }}
+                {% for theme in themes %}
+                    <span class="badge bg-secondary me-1">
+                        {{ theme.theme }}
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
