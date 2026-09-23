@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau message de contact</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f1ec; font-family: Arial, Helvetica, sans-serif; color: #3a2e28;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ec; padding: 32px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+
+                    <tr>
+                        <td style="background-color: #691b37; padding: 24px 32px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px;">Vite &amp; Gourmand</h1>
+                            <p style="margin: 4px 0 0; color: #f4d9c6; font-size: 14px;">Nouveau message de contact reçu</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.5;">
+                                Un visiteur vient de soumettre le formulaire de contact du site. Voici le détail de sa demande :
+                            </p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #8a7d74; text-transform: uppercase; letter-spacing: 0.5px;">Titre</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 16px; font-size: 16px; font-weight: bold;">
+                                        {{ contactRequest.titre }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #8a7d74; text-transform: uppercase; letter-spacing: 0.5px;">Message</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 16px; font-size: 15px; line-height: 1.6; white-space: pre-line;">
+                                        {{ contactRequest.description }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #8a7d74; text-transform: uppercase; letter-spacing: 0.5px;">Email du visiteur</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0;">
+                                        <a href="mailto:{{ contactRequest.email }}" style="font-size: 15px; color: #691b37; text-decoration: none;">
+                                            {{ contactRequest.email }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="border-radius: 4px; background-color: #691b37;">
+                                        <a href="mailto:{{ contactRequest.email }}?subject=Re: {{ contactRequest.titre }}"
+                                           style="display: inline-block; padding: 12px 24px; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 4px;">
+                                            Répondre au visiteur
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

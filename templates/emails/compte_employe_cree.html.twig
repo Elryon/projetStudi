@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue chez Vite & Gourmand</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f1ec; font-family: Arial, Helvetica, sans-serif; color: #3a2e28;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ec; padding: 32px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+
+                    <tr>
+                        <td style="background-color: #691b37; padding: 32px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 22px;">Bienvenue dans l'équipe !</h1>
+                            <p style="margin: 8px 0 0; color: #f4d9c6; font-size: 14px;">Vite &amp; Gourmand</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6;">
+                                Bonjour {{ user.prenom }},
+                            </p>
+
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6;">
+                                Votre compte employé vient d'être créé avec succès. Vous faites désormais partie de l'équipe Vite &amp; Gourmand, nous sommes ravis de vous compter parmi nous !
+                            </p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ec; border-radius: 6px; margin-bottom: 24px;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0 0 4px; font-size: 12px; color: #8a7d74; text-transform: uppercase; letter-spacing: 0.5px;">Votre identifiant de connexion</p>
+                                        <p style="margin: 0; font-size: 16px; font-weight: bold; color: #691b37;">{{ user.email }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.6;">
+                                Pour des raisons de sécurité, votre mot de passe ne vous est pas transmis par email. Merci de vous rapprocher de :
+                            </p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e8e0d8; border-radius: 6px; margin: 12px 0 28px;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0; font-size: 15px; font-weight: bold;">{{ admin.prenom }} {{ admin.nom }}</p>
+                                        <p style="margin: 2px 0 0; font-size: 13px; color: #8a7d74;">pour obtenir votre mot de passe</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0; font-size: 15px; line-height: 1.6;">
+                                À très bientôt,<br>
+                                <strong>L'équipe Vite &amp; Gourmand</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

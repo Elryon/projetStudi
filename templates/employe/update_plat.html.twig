@@ -1,27 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mise à jour de plat{% endblock %}
+{% block title %}Modifier le plat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1>Modifier le plat</h1>
+    <div class="auth-wrapper auth-wrapper--top">
+        <div class="auth-card auth-card--md">
+            <h1>Modifier le plat</h1>
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
 
-        {% if plats.photo %}
-            <div class="mb-3">
-                <img src="{{ asset('imgs/photoPlats/' ~ plats.photo) }}" alt="Photo du plat" class="img-thumbnail" style="max-width: 200px;">
-            </div>
-        {% endif %}
+            {% if plats.photo %}
+                <div class="text-center mb-4">
+                    <img src="{{ asset('imgs/photoPlats/' ~ plats.photo) }}"
+                         alt="Photo de {{ plats.nom }}"
+                         class="current-photo">
+                    <p class="text-muted small mt-2 mb-0">Photo actuelle</p>
+                </div>
+            {% endif %}
 
-        {{ form_start(registrationForm) }}
-            {{ form_row(registrationForm.nom) }}
-            {{ form_row(registrationForm.photo) }}
-            {{ form_row(registrationForm.allergenes) }}
-            {{ form_row(registrationForm.disponible) }}
-            <button type="submit" class="btn btn-primary mt-3">Modifier le plat</button>
-        {{ form_end(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'class': 'app-form'}}) }}
+
+                <p class="form-section-title">🥘 Informations du plat</p>
+
+                <div class="mb-3">
+                    {{ form_row(registrationForm.nom, {attr: {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_row(registrationForm.photo, {attr: {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_row(registrationForm.allergenes, {attr: {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_row(registrationForm.disponible) }}
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Enregistrer les modifications</button>
+                </div>
+
+            {{ form_end(registrationForm) }}
+        </div>
     </div>
 {% endblock %}

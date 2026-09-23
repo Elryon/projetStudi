@@ -1,0 +1,12 @@
+{% if horaires %}
+    <div class="footer-horaires">
+        {% for jour, label in {
+            lundi: 'Lun', mardi: 'Mar', mercredi: 'Mer', jeudi: 'Jeu',
+            vendredi: 'Ven', samedi: 'Sam', dimanche: 'Dim'
+        } %}
+            <span class="footer-horaire-item">
+                <strong>{{ label }}</strong> {{ attribute(horaires, jour) }}
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}

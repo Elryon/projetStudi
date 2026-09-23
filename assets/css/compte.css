@@ -1,0 +1,214 @@
+/* ══════════════════════════════════════
+   MON COMPTE — Styles spécifiques
+   ══════════════════════════════════════ */
+
+/* ── Cards (réutilise .filtre-card comme base) ── */
+.compte-info-card,
+.compte-commandes-card {
+    position: static;
+}
+
+.compte-commandes-card h5 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--brun-doux);
+}
+
+/* ── Liste d'informations utilisateur ── */
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .75rem 0;
+    border-bottom: 1px solid var(--gris-clair);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(192, 57, 43, .06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .95rem;
+    flex-shrink: 0;
+}
+
+.info-label {
+    display: block;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--brun-clair);
+    font-weight: 600;
+    margin-bottom: .15rem;
+}
+
+.info-value {
+    display: block;
+    font-size: .92rem;
+    color: var(--brun-doux);
+    font-weight: 500;
+}
+
+/* ── Bouton btn-details : variante compacte pour tableau ── */
+.btn-details-sm {
+    padding: .3rem .75rem;
+    font-size: .78rem;
+}
+
+/* ── Tableau commandes ── */
+.table-commandes {
+    margin-bottom: 0;
+}
+
+.table-commandes thead th {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--brun-clair);
+    border-bottom: 2px solid var(--gris-clair);
+    padding-bottom: .75rem;
+}
+
+.table-commandes tbody td {
+    padding: .9rem .75rem;
+    border-bottom: 1px solid var(--gris-clair);
+    font-size: .9rem;
+    color: var(--gris-texte);
+}
+
+.table-commandes tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-commandes tbody tr {
+    transition: background-color .2s;
+}
+
+.table-commandes tbody tr:hover {
+    background-color: rgba(192, 57, 43, .03);
+}
+
+/* ── Badges de statut ── */
+.badge-statut {
+    display: inline-block;
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    font-size: .76rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.statut-attente        { background: #fff8e1; color: #9f4500; }
+.statut-accepte         { background: #e0f7fa; color: #00838f; }
+.statut-preparation     { background: #f3e5f5; color: #7b1fa2; }
+.statut-livraison       { background: #e3f2fd; color: #1565c0; }
+.statut-livre           { background: #e8f5e9; color: #2e7d32; }
+.statut-termine         { background: #e8f5e9; color: #2e7d32; }
+.statut-attente_retour_materiel { background: #fff8e1; color: #9f4500; }
+.statut-annule,
+.statut-refuse          { background: #fbe9e7; color: #c0392b; }
+
+/* ── Responsive ── */
+@media (max-width: 991px) {
+    .compte-info-card,
+    .compte-commandes-card {
+        position: static;
+    }
+}
+
+/* ── Grille d'infos sur 2 colonnes (page détail commande) ── */
+.info-list-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+}
+
+.info-list-grid .info-row {
+    border-bottom: 1px solid var(--gris-clair);
+}
+
+@media (max-width: 767px) {
+    .info-list-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Alerte annulation ── */
+.alerte-annulation {
+    background: #fbe9e7;
+    border-left: 3px solid #c0392b;
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+}
+
+.alerte-annulation .alerte-titre {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #c0392b;
+    margin-bottom: .5rem;
+}
+
+/* ── Barre de suivi de commande ── */
+.suivi-progress {
+    background: var(--gris-clair);
+    border-radius: 999px;
+    height: 32px;
+    overflow: hidden;
+    position: relative;
+}
+
+.suivi-progress-bar {
+    background: var(--rouge-nappe);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 1rem;
+    color: var(--blanc);
+    font-size: .82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: width .4s ease;
+    border-radius: 999px;
+}
+
+/* ── Bouton d'action variante danger ── */
+.btn-details-danger {
+    border-color: #c0392b;
+    color: #c0392b;
+}
+
+.btn-details-danger:hover {
+    background: #c0392b;
+    color: var(--blanc);
+}
+
+/* ── Étoiles d'avis ── */
+.avis-etoiles {
+    color: var(--jaune-badge, #f5c518);
+    font-size: 1.2rem;
+    letter-spacing: .1rem;
+}
+
+/* ── Statut supplémentaire (casse mixte de l'enum) ── */
+.statut-attenteretourmateriel {
+    background: #fff8e1;
+    color: #9f4500;
+}

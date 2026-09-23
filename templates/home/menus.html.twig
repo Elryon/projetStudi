@@ -1,42 +1,199 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Menus{% endblock %}
+{% block title %}Nos Menus{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/menus.css') }}">
+{% endblock %}
 
 {% block body %}
-    {% if menus is empty %}
-        <div class="text-center py-5 text-muted">
-            <p class="fs-5">Aucun menu pour le moment.</p>
+    <div class="page-menus">
+
+        <div class="page-header">
+            <h1>Nos Menus</h1>
+            <p class="subtitle">Des saveurs pour chaque occasion</p>
+            <span class="divider"></span>
         </div>
-    {% else %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for menu in menus %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ menu.titre }}</h5>
-                            <p class="text-muted small">{{ menu.description }}</p>
 
-                            <ul class="list-unstyled small mb-2">
-                                <li><strong>Min. personnes :</strong> {{ menu.personneMin }}</li>
-                                <li><strong>Prix :</strong> {{ menu.prixPersonne }} € / pers.</li>
-                            </ul>
+        <div class="container pb-5">
+            <div class="row">
 
-                            {% if menu.regime %}
-                                <span class="badge bg-info text-dark">{{ menu.regime.nom }}</span>
-                            {% endif %}
-                            {% if menu.theme %}
-                                <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
-                            {% endif %}
+                {# ===== COLONNE FILTRES ===== #}
+                <div class="col-lg-3 mb-4">
+                    <div class="filtre-card">
+                        <h5>Filtres</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Prix min (€/pers.)</label>
+                            <input type="number" id="filtre-prix-min" class="form-control" step="0.01" min="0" placeholder="0">
                         </div>
 
-                        <div class="card-footer bg-transparent border-top-0 text-end">
-                            <a href="{{ path('app_details_menu', {id: menu.id}) }}" class="btn btn-outline-primary btn-sm">
-                                Détails
-                            </a>
+                        <div class="mb-3">
+                            <label class="form-label">Prix max (€/pers.)</label>
+                            <input type="number" id="filtre-prix-max" class="form-control" step="0.01" min="0" placeholder="∞">
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Thème</label>
+                            <select id="filtre-theme" class="form-select">
+                                <option value="">Tous</option>
+                                {% for theme in themes %}
+                                    <option value="{{ theme.theme }}">{{ theme.theme }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Régime</label>
+                            <select id="filtre-regime" class="form-select">
+                                <option value="">Tous</option>
+                                {% for regime in regimes %}
+                                    <option value="{{ regime.value }}">{{ regime.getLabel }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de personnes</label>
+                            <input type="number" id="filtre-personnes" class="form-control" min="1" placeholder="Ex : 10">
+                        </div>
+
+                        <button id="btn-reset" class="btn-reset">Réinitialiser</button>
                     </div>
                 </div>
-            {% endfor %}
+
+                {# ===== COLONNE MENUS ===== #}
+                <div class="col-lg-9">
+                    {% if menus is empty %}
+                        <div class="empty-state">
+                            <div class="icon-empty">🍽️</div>
+                            <p>Aucun menu pour le moment.</p>
+                        </div>
+                    {% else %}
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for menu in menus %}
+                                <div class="col menu-card"
+                                     style="animation-delay: {{ loop.index0 * 0.08 }}s"
+                                     data-prix="{{ menu.prixPersonne|replace({',': '.'}) }}"
+                                     data-theme="{{ menu.theme ? menu.theme.theme : '' }}"
+                                     data-regime="{{ menu.regime ? menu.regime.value : '' }}"
+                                     data-personnes="{{ menu.personneMin }}">
+
+                                    <div class="nappe-border{% if menu.regime %} regime-{{ menu.regime.value|lower }}{% endif %}">
+                                        <div class="menu-inner">
+                                            <h5 class="card-title">{{ menu.titre }}</h5>
+                                            <p class="card-desc">{{ menu.description }}</p>
+
+                                            <div class="menu-meta">
+                                                <span class="meta-item meta-prix">
+                                                    <span class="icon">💰</span>
+                                                    <span><strong>{{ menu.prixPersonne }} €</strong> / pers.</span>
+                                                </span>
+                                                <span class="meta-item meta-personnes">
+                                                    <span class="icon">👥</span>
+                                                    <span>Min. <strong>{{ menu.personneMin }}</strong> pers.</span>
+                                                </span>
+                                            </div>
+
+                                            <div class="badge-row">
+                                                {% if menu.regime %}
+                                                    <span class="badge-labeled">
+                                                        <span class="badge-label">Régime :</span>
+                                                        <span class="badge-pill regime-{{ menu.regime.value|lower }}">{{ menu.regime.getLabel }}</span>
+                                                    </span>
+                                                {% endif %}
+                                                {% if menu.theme %}
+                                                    <span class="badge-labeled">
+                                                        <span class="badge-label">Thème :</span>
+                                                        <span class="badge-pill pill-theme">{{ menu.theme.theme }}</span>
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="menu-footer">
+                                                <a href="{{ path('app_details_menu', {id: menu.id}) }}" class="btn btn-{% if menu.regime.value|lower == 'vegetarien' %}success{% elseif menu.regime.value|lower == 'poisson' %}info{% elseif menu.regime.value|lower == 'vegan' %}warning{% else %}primary{% endif %}">
+                                                    Voir le détail <span class="arrow">→</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <p id="aucun-resultat" class="text-center py-5 d-none">Aucun menu ne correspond à vos critères.</p>
+                    {% endif %}
+                </div>
+
+            </div>
         </div>
-    {% endif %}
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const prixMin    = document.getElementById('filtre-prix-min');
+            const prixMax    = document.getElementById('filtre-prix-max');
+            const theme      = document.getElementById('filtre-theme');
+            const regime     = document.getElementById('filtre-regime');
+            const personnes  = document.getElementById('filtre-personnes');
+            const btnReset   = document.getElementById('btn-reset');
+            const cards      = document.querySelectorAll('.menu-card');
+            const aucunResultat = document.getElementById('aucun-resultat');
+
+            if (!prixMin) return;
+
+            function filtrer() {
+                const fPrixMin   = parseFloat(prixMin.value) || 0;
+                const fPrixMax   = parseFloat(prixMax.value) || Infinity;
+                const fTheme     = theme.value;
+                const fRegime    = regime.value;
+                const fPersonnes = parseInt(personnes.value) || 0;
+
+                let visible = 0;
+
+                cards.forEach(function (card) {
+                    const cardPrix      = parseFloat(card.dataset.prix.replace(',', '.'));
+                    const cardTheme     = card.dataset.theme;
+                    const cardRegime    = card.dataset.regime;
+                    const cardPersonnes = parseInt(card.dataset.personnes);
+
+                    let show = true;
+
+                    if (cardPrix < fPrixMin)                    show = false;
+                    if (cardPrix > fPrixMax)                    show = false;
+                    if (fTheme && cardTheme !== fTheme)         show = false;
+                    if (fRegime && cardRegime !== fRegime)      show = false;
+                    if (fPersonnes && cardPersonnes > fPersonnes) show = false;
+
+                    card.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+
+                if (aucunResultat) {
+                    aucunResultat.classList.toggle('d-none', visible > 0);
+                }
+            }
+
+            prixMin.addEventListener('input', filtrer);
+            prixMax.addEventListener('input', filtrer);
+            theme.addEventListener('change', filtrer);
+            regime.addEventListener('change', filtrer);
+            personnes.addEventListener('input', filtrer);
+
+            btnReset.addEventListener('click', function () {
+                prixMin.value   = '';
+                prixMax.value   = '';
+                theme.value     = '';
+                regime.value    = '';
+                personnes.value = '';
+                filtrer();
+            });
+        });
+    </script>
 {% endblock %}

@@ -38,6 +38,7 @@ class MenuRepository extends ServiceEntityRepository
                 INNER JOIN menus2.plats plats2
                 WHERE plats2.disponible = false
             )')
+            ->andWhere('menus.personne_min < menus.quantite_restante')
             ->getQuery()
             ->getResult();
     }

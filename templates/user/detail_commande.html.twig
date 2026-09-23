@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande #{{ commande.id|slice(0, 8) }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/menus.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/compte.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page-compte">
+
+        <div class="page-header">
+            <h1>Commande #{{ commande.id|slice(0, 8) }}</h1>
+            <p class="subtitle">{{ commande.menu.titre }}</p>
+            <span class="divider"></span>
+        </div>
+
+        <div class="container pb-5" style="max-width: 900px;">
+
+            <a href="{{ path('app_user') }}" class="btn-details btn-details-sm mb-4">
+                <span class="arrow" style="transform: rotate(180deg);">→</span> Retour
+            </a>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# Alerte si annulée #}
+            {% if commande.dernierStatut.statut.value == 'annule' %}
+                <div class="alerte-annulation mb-4">
+                    <p class="alerte-titre">Commande annulée</p>
+                    {% if commande.motifAnnulation %}
+                        <p class="mb-1"><strong>Motif :</strong> {{ commande.motifAnnulation }}</p>
+                    {% endif %}
+                    {% if commande.modeContact %}
+                        <p class="mb-0"><strong>Contacté par :</strong> {{ commande.modeContact == 'telephone' ? 'Appel téléphonique' : 'Email' }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="filtre-card compte-commandes-card mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="mb-0">Détails de la commande</h5>
+                    <span class="badge-statut statut-{{ commande.dernierStatut.statut.value|lower }}">
+                        {{ commande.dernierStatut.statut.getLabel }}
+                    </span>
+                </div>
+
+                <ul class="info-list info-list-grid">
+                    <li class="info-row">
+                        <span class="info-icon">🍽️</span>
+                        <div>
+                            <span class="info-label">Menu</span>
+                            <span class="info-value">{{ commande.menu.titre }}</span>
+                        </div>
+                    </li>
+                    <li class="info-row">
+                        <span class="info-icon">👥</span>
+                        <div>
+                            <span class="info-label">Nombre de personnes</span>
+                            <span class="info-value">{{ commande.nombrePersonne }}</span>
+                        </div>
+                    </li>
+                    <li class="info-row">
+                        <span class="info-icon">🧰</span>
+                        <div>
+                            <span class="info-label">Prêt de matériel</span>
+                            <span class="info-value">{{ commande.pretMateriel ? 'Oui' : 'Non' }}</span>
+                        </div>
+                    </li>
+                    {% if commande.pretMateriel %}
+                        <li class="info-row">
+                            <span class="info-icon">↩️</span>
+                            <div>
+                                <span class="info-label">Matériel rendu</span>
+                                <span class="info-value">{{ commande.materielRendu ? 'Oui' : 'Non' }}</span>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <li class="info-row">
+                        <span class="info-icon">📍</span>
+                        <div>
+                            <span class="info-label">Adresse de livraison</span>
+                            <span class="info-value">{{ commande.adresse }}</span>
+                        </div>
+                    </li>
+                    <li class="info-row">
+                        <span class="info-icon">📅</span>
+                        <div>
+                            <span class="info-label">Date de commande</span>
+                            <span class="info-value">{{ commande.dateCommande|date('d/m/Y H:i') }}</span>
+                        </div>
+                    </li>
+                    <li class="info-row">
+                        <span class="info-icon">🚚</span>
+                        <div>
+                            <span class="info-label">Date de livraison</span>
+                            <span class="info-value">{{ commande.dateLivraison|date('d/m/Y H:i') }}</span>
+                        </div>
+                    </li>
+                    <li class="info-row">
+                        <span class="info-icon">💰</span>
+                        <div>
+                            <span class="info-label">Prix (hors livraison)</span>
+                            <span class="info-value">{{ commande.prixTotal - commande.prixLivraison }} €</span>
+                        </div>
+                    </li>
+                    {% if commande.prixLivraison > 0 %}
+                        <li class="info-row">
+                            <span class="info-icon">🚛</span>
+                            <div>
+                                <span class="info-label">Prix de la livraison</span>
+                                <span class="info-value">{{ commande.prixLivraison }} €</span>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                {# Suivi visible après acceptation, sauf si annulée #}
+                {% if commande.dernierStatut.statut.value not in ['attente', 'annule'] %}
+                    <p class="form-section-title mt-4">Suivi de la commande</p>
+
+                    {% if commande.pretMateriel %}
+                        {% set steps = ['accepte', 'preparation', 'livraison', 'livre', 'AttenteRetourMateriel', 'termine'] %}
+                    {% else %}
+                        {% set steps = ['accepte', 'preparation', 'livraison', 'livre', 'termine'] %}
+                    {% endif %}
+
+                    {% set currentIndex = 0 %}
+                    {% for step in steps %}
+                        {% if commande.dernierStatut.statut.value == step %}
+                            {% set currentIndex = loop.index %}
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="suivi-progress mt-3">
+                        <div class="suivi-progress-bar" style="width: {{ (currentIndex / steps|length) * 100 }}%">
+                            {{ commande.dernierStatut.statut.getLabel }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Actions possibles uniquement en attente #}
+            {% if app.user.id == commande.user.id %}
+                {% if commande.dernierStatut.statut.value == 'attente' %}
+                    <div class="d-flex gap-2 mb-4">
+                        <a href="{{ path('app_modifier_commande', {id: commande.id}) }}" class="btn-details">
+                            Modifier la commande <span class="arrow">→</span>
+                        </a>
+                        <form method="post" action="{{ path('app_annuler_commande', {id: commande.id}) }}"
+                            onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ commande.id) }}">
+                            <button type="submit" class="btn-details btn-details-danger">Annuler la commande</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% if commande.avis %}
+                    <div class="filtre-card compte-commandes-card mb-4">
+                        <h5 class="mb-3">Votre avis</h5>
+                        <p class="mb-2">
+                            <span class="avis-etoiles">
+                                {% for i in 1..5 %}
+                                    {% if i <= commande.avis.note %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                        </p>
+                        <p class="mb-2">{{ commande.avis.contenu }}</p>
+                        {% if not commande.avis.validated %}
+                            <span class="badge-statut statut-attente">En attente de validation</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if avisForm is defined and avisForm %}
+                    <div class="filtre-card compte-commandes-card">
+                        <h5 class="mb-3">Laisser un avis</h5>
+                        {{ form_start(avisForm, {'attr': {'class': 'app-form'}}) }}
+                            {{ form_row(avisForm.note, {attr: {'class': 'form-control'}}) }}
+                            {{ form_row(avisForm.contenu, {attr: {'class': 'form-control'}}) }}
+                            <button type="submit" class="btn-details mt-2">Envoyer mon avis <span class="arrow">→</span></button>
+                        {{ form_end(avisForm) }}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}

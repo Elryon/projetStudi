@@ -2,20 +2,24 @@
 
 namespace App\Entity;
 
+use App\Enum\Regime;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $titre = null;
@@ -34,10 +38,6 @@ class Menu
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Regime $regime = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Theme $theme = null;
 
     /**
@@ -47,12 +47,18 @@ class Menu
     #[ORM\ManyToMany(targetEntity: Plats::class)]
     private Collection $plats;
 
+    #[ORM\Column(enumType: Regime::class)]
+    private ?Regime $regime = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $conditions = null;
+
     public function __construct()
     {
         $this->plats = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
@@ -117,18 +123,6 @@ class Menu
         return $this;
     }
 
-    public function getRegime(): ?Regime
-    {
-        return $this->regime;
-    }
-
-    public function setRegime(?Regime $regime): static
-    {
-        $this->regime = $regime;
-
-        return $this;
-    }
-
     public function getTheme(): ?Theme
     {
         return $this->theme;
@@ -161,6 +155,30 @@ class Menu
     public function removePlat(Plats $plat): static
     {
         $this->plats->removeElement($plat);
+
+        return $this;
+    }
+
+    public function getRegime(): ?Regime
+    {
+        return $this->regime;
+    }
+
+    public function setRegime(Regime $regime): static
+    {
+        $this->regime = $regime;
+
+        return $this;
+    }
+
+    public function getConditions(): ?string
+    {
+        return $this->conditions;
+    }
+
+    public function setConditions(?string $conditions): static
+    {
+        $this->conditions = $conditions;
 
         return $this;
     }

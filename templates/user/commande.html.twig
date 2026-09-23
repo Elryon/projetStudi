@@ -1,0 +1,311 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Passer une commande{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="auth-wrapper auth-wrapper--top">
+        <div class="auth-card auth-card--lg">
+            <h1>Passer une commande</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {{ form_start(commandeForm, {'attr': {'class': 'app-form'}}) }}
+
+                <p class="form-section-title">🍽️ Menu</p>
+                {{ form_row(commandeForm.menu, {attr: {'class': 'form-select'}}) }}
+                <p class="text-muted small mb-2" id="quantite-restante"></p>
+                <div id="menu-conditions" class="alert alert-warning fs-5 d-none" role="alert"></div>
+
+                <p class="form-section-title mt-4">📋 Détails de la commande</p>
+                {{ form_row(commandeForm.nombre_personne, {
+                    help: 'Le nombre minimum dépend du menu sélectionné.',
+                    attr: {'class': 'form-control'}
+                }) }}
+                <div id="erreur-personne-min" class="alert alert-danger py-2 px-3 mt-n2 mb-3 d-none"></div>
+
+                {{ form_row(commandeForm.pret_materiel) }}
+
+                <p class="form-section-title mt-4">🚚 Livraison</p>
+                {{ form_row(commandeForm.adresse, {attr: {'class': 'form-control'}}) }}
+                {{ form_row(commandeForm.date_livraison, {attr: {'class': 'form-control'}}) }}
+
+                <p class="form-section-title mt-4">🧾 Récapitulatif</p>
+                <p class="mb-1"><strong>Estimation : <span id="prix-estime">—</span></strong></p>
+                <p class="text-muted small mt-3">Le prix final sera calculé automatiquement à la validation :</p>
+                <ul class="list-unstyled small">
+                    <li>Prix du menu × nombre de personnes</li>
+                    <li>+ Frais de livraison si hors Bordeaux (5 € + 0.59 €/km)</li>
+                    <li>Livraison gratuite à Bordeaux</li>
+                </ul>
+
+                <button type="submit" id="btn-commander" class="btn btn-success btn-lg mt-4 w-100">Confirmer la commande</button>
+
+            {{ form_end(commandeForm) }}
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalConfirmation" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmer votre commande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-loading" class="text-center py-3">
+                        <div class="spinner-border" role="status"></div>
+                        <p class="mt-2 mb-0">Calcul du prix en cours...</p>
+                    </div>
+
+                    <div id="modal-erreur" class="alert alert-danger d-none"></div>
+
+                    <div id="modal-recap" class="d-none">
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Menu</td>
+                                    <td class="text-end" id="recap-menu"></td>
+                                </tr>
+                                <tr>
+                                    <td>Nombre de personnes</td>
+                                    <td class="text-end" id="recap-personnes"></td>
+                                </tr>
+                                <tr>
+                                    <td>Prix repas</td>
+                                    <td class="text-end" id="recap-repas"></td>
+                                </tr>
+                                <tr>
+                                    <td>Frais de livraison<br><span class="text-muted small" id="recap-ville"></span></td>
+                                    <td class="text-end" id="recap-livraison"></td>
+                                </tr>
+                                <tr class="fw-bold border-top">
+                                    <td>Total</td>
+                                    <td class="text-end" id="recap-total"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" id="btn-confirmer-commande" class="btn btn-success" disabled>Valider la commande</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function initCommandePage() {
+            const menuSelect = document.querySelector('#commande_menu');
+
+            // Si on n'est pas sur cette page (navigation Turbo vers une autre route),
+            // les éléments n'existent pas : on sort proprement.
+            if (!menuSelect) {
+                return;
+            }
+
+            const menus = {
+                {% for menu in menus %}
+                    '{{ menu.id }}': {
+                        min: {{ menu.personneMin }},
+                        prix: {{ menu.prixPersonne|number_format(2, '.', '') }},
+                        quantiteRestante: {{ menu.quantiteRestante }},
+                        conditions: {{ menu.conditions ? ('"' ~ menu.conditions|e('js') ~ '"')|raw : 'null' }}
+                    },
+                {% endfor %}
+            };
+
+            const form = menuSelect.closest('form');
+            const nombreInput = document.querySelector('#commande_nombre_personne');
+            const adresseInput = document.querySelector('#commande_adresse');
+            const btnCommander = document.querySelector('#btn-commander');
+            const prixEstime = document.querySelector('#prix-estime');
+            const erreurPersonne = document.querySelector('#erreur-personne-min');
+            const quantiteRestanteEl = document.querySelector('#quantite-restante');
+            const menuConditionsEl = document.querySelector('#menu-conditions');
+
+            const modalEl = document.querySelector('#modalConfirmation');
+            const modal = new bootstrap.Modal(modalEl);
+            const modalLoading = document.querySelector('#modal-loading');
+            const modalErreur = document.querySelector('#modal-erreur');
+            const modalRecap = document.querySelector('#modal-recap');
+            const btnConfirmer = document.querySelector('#btn-confirmer-commande');
+
+            let commandeValidee = false;
+
+            function getMenuData() {
+                return menus[menuSelect.value] || null;
+            }
+
+            function updatePrixEstime() {
+                const menuData = getMenuData();
+                const nombre = parseInt(nombreInput.value) || 0;
+
+                if (!menuData || nombre <= 0) {
+                    prixEstime.textContent = '—';
+                    return;
+                }
+
+                const total = menuData.prix * nombre;
+                prixEstime.textContent = total.toFixed(2) + ' € (hors livraison)';
+            }
+
+            function validerMin() {
+                const menuData = getMenuData();
+                const nombre = parseInt(nombreInput.value) || 0;
+
+                if (!menuData) {
+                    erreurPersonne.classList.add('d-none');
+                    return true;
+                }
+
+                nombreInput.min = menuData.min;
+
+                if (nombre < menuData.min) {
+                    erreurPersonne.textContent = `Ce menu nécessite au moins ${menuData.min} personnes.`;
+                    erreurPersonne.classList.remove('d-none');
+                    return false;
+                }
+
+                erreurPersonne.classList.add('d-none');
+                return true;
+            }
+
+            function updateInfosMenu() {
+                const menuData = getMenuData();
+
+                if (!menuData) {
+                    quantiteRestanteEl.textContent = '';
+                    menuConditionsEl.classList.add('d-none');
+                    return;
+                }
+
+                quantiteRestanteEl.textContent = `${menuData.quantiteRestante} couvert(s) restant(s) pour ce menu.`;
+
+                if (menuData.conditions) {
+                    menuConditionsEl.textContent = menuData.conditions;
+                    menuConditionsEl.classList.remove('d-none');
+                } else {
+                    menuConditionsEl.classList.add('d-none');
+                }
+            }
+
+            function onChange() {
+                validerMin();
+                updatePrixEstime();
+                updateInfosMenu();
+                commandeValidee = false;
+            }
+
+            menuSelect.addEventListener('change', function() {
+                const menuData = getMenuData();
+                if (menuData && parseInt(nombreInput.value) < menuData.min) {
+                    nombreInput.value = menuData.min;
+                }
+                onChange();
+            });
+
+            nombreInput.addEventListener('input', onChange);
+            adresseInput.addEventListener('input', onChange);
+
+            function resetModal() {
+                modalLoading.classList.remove('d-none');
+                modalErreur.classList.add('d-none');
+                modalRecap.classList.add('d-none');
+                btnConfirmer.disabled = true;
+            }
+
+            async function chargerEstimation() {
+                resetModal();
+
+                try {
+                    const response = await fetch('{{ path('app_commande_estimer_prix') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            menu: menuSelect.value,
+                            nombre_personne: nombreInput.value,
+                            adresse: adresseInput.value,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    modalLoading.classList.add('d-none');
+
+                    if (!response.ok) {
+                        modalErreur.textContent = data.error || 'Une erreur est survenue.';
+                        modalErreur.classList.remove('d-none');
+                        return;
+                    }
+
+                    document.querySelector('#recap-menu').textContent = data.menu;
+                    document.querySelector('#recap-personnes').textContent = data.nombre_personne;
+                    document.querySelector('#recap-repas').textContent = data.prix_repas.toFixed(2) + ' €';
+                    document.querySelector('#recap-livraison').textContent = data.gratuit
+                        ? 'Gratuite'
+                        : data.frais_livraison.toFixed(2) + ' €';
+                    document.querySelector('#recap-ville').textContent = data.ville ? `(${data.ville})` : '';
+                    document.querySelector('#recap-total').textContent = data.prix_total.toFixed(2) + ' €';
+
+                    modalRecap.classList.remove('d-none');
+                    btnConfirmer.disabled = false;
+                } catch (e) {
+                    modalLoading.classList.add('d-none');
+                    modalErreur.textContent = 'Impossible de contacter le serveur.';
+                    modalErreur.classList.remove('d-none');
+                }
+            }
+
+            form.addEventListener('submit', function(e) {
+                if (commandeValidee) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                if (!validerMin()) {
+                    return;
+                }
+
+                if (!menuSelect.value || !nombreInput.value || !adresseInput.value) {
+                    return;
+                }
+
+                modal.show();
+                chargerEstimation();
+            });
+
+            btnConfirmer.addEventListener('click', function() {
+                commandeValidee = true;
+                modal.hide();
+                form.submit();
+            });
+
+            onChange();
+        }
+
+        document.addEventListener('DOMContentLoaded', initCommandePage);
+        document.addEventListener('turbo:load', initCommandePage);
+    </script>
+{% endblock %}

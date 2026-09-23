@@ -1,0 +1,268 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/employe.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page-employe">
+
+        <div class="page-header">
+            <h1>Administration</h1>
+            <span class="divider"></span>
+        </div>
+
+        <div class="container pb-5">
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# ===== SECTION EMPLOYÉS ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-bleu">👥</span>
+                    Gestion des employés
+                </h2>
+            </div>
+
+            <div class="employe-card employe-card--dashed mb-4">
+                {{ form_start(employeForm, {'attr': {'class': 'app-form'}}) }}
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md">
+                            {{ form_widget(employeForm.nom, {attr: {class: 'form-control form-control-sm', placeholder: 'Nom'}}) }}
+                        </div>
+                        <div class="col-md">
+                            {{ form_widget(employeForm.prenom, {attr: {class: 'form-control form-control-sm', placeholder: 'Prénom'}}) }}
+                        </div>
+                        <div class="col-md">
+                            {{ form_widget(employeForm.email, {attr: {class: 'form-control form-control-sm', placeholder: 'Email'}}) }}
+                        </div>
+                        <div class="col-md">
+                            {{ form_widget(employeForm.plainPassword, {attr: {class: 'form-control form-control-sm', placeholder: 'Mot de passe'}}) }}
+                        </div>
+                        <div class="col-md-auto">
+                            <button type="submit" class="btn-employe btn-employe-success">+ Créer</button>
+                        </div>
+                    </div>
+                    {% if not employeForm.vars.valid and employeForm.vars.submitted %}
+                        <ul class="employe-form-errors">
+                            {{ form_errors(employeForm.nom) }}
+                            {{ form_errors(employeForm.prenom) }}
+                            {{ form_errors(employeForm.email) }}
+                            {{ form_errors(employeForm.plainPassword) }}
+                        </ul>
+                    {% endif %}
+                {{ form_end(employeForm) }}
+            </div>
+
+            <div class="employe-card p-0 mb-5">
+                {% if employes is empty %}
+                    <div class="employe-empty">
+                        Aucun employé pour le moment.
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table-employe mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employe in employes %}
+                                    <tr>
+                                        <td>{{ employe.nom }}</td>
+                                        <td>{{ employe.prenom }}</td>
+                                        <td class="text-muted">{{ employe.email }}</td>
+                                        <td class="text-end">
+                                            <form method="post"
+                                                action="{{ path('app_retrograder', {id: employe.id}) }}"
+                                                onsubmit="return confirm('Retirer le rôle employé à {{ employe.prenom }} {{ employe.nom }} ?')">
+                                                <button type="submit" class="btn-employe btn-employe-outline-danger btn-employe-xs">Retirer</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+
+            <hr class="section-separator">
+
+            {# ===== SECTION STATISTIQUES ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-jaune">📊</span>
+                    Statistiques
+                </h2>
+                <button class="btn-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStats" aria-expanded="true" aria-controls="collapseStats">
+                    Afficher / Masquer
+                </button>
+            </div>
+
+            <div class="collapse show" id="collapseStats">
+
+                <div class="employe-card mb-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Menu</label>
+                            <select id="filtre-menu" class="form-select form-select-sm">
+                                <option value="">Tous les menus</option>
+                                {% for titre in menuTitres %}
+                                    <option value="{{ titre }}">{{ titre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date début</label>
+                            <input type="date" id="filtre-debut" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date fin</label>
+                            <input type="date" id="filtre-fin" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <button id="btn-filtrer-stats" class="btn-employe btn-employe-primary w-100">Appliquer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <div class="chart-card">
+                            <h5>Commandes par menu</h5>
+                            <canvas id="chartCommandes"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-card">
+                            <h5>Chiffre d'affaires par menu</h5>
+                            <canvas id="chartCA"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ca-total-card">
+                    <h5>Chiffre d'affaires total</h5>
+                    <p id="ca-total" class="ca-total-value mb-0">
+                        {{ caTotal|number_format(2, ',', ' ') }} €
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script data-turbo-permanent id="chartjs-script" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+    document.addEventListener('turbo:load', function() {
+        var canvas1 = document.getElementById('chartCommandes');
+        var canvas2 = document.getElementById('chartCA');
+
+        if (!canvas1 || !canvas2) return;
+        if (typeof Chart === 'undefined') return;
+
+        if (window.myChartCommandes) window.myChartCommandes.destroy();
+        if (window.myChartCA) window.myChartCA.destroy();
+
+        var initialLabels = [{% for titre, count in parMenu %}'{{ titre }}'{% if not loop.last %},{% endif %}{% endfor %}];
+        var initialCommandes = [{% for titre, count in parMenu %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}];
+        var initialCA = [{% for titre, ca in caParMenu %}{{ ca }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+        var colors = ['#c0392b','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#1abc9c','#e74c3c'];
+
+        window.myChartCommandes = new Chart(canvas1, {
+            type: 'bar',
+            data: {
+                labels: initialLabels,
+                datasets: [{
+                    label: 'Nombre de commandes',
+                    data: initialCommandes,
+                    backgroundColor: colors.slice(0, initialLabels.length),
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,.04)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        window.myChartCA = new Chart(canvas2, {
+            type: 'doughnut',
+            data: {
+                labels: initialLabels,
+                datasets: [{
+                    data: initialCA,
+                    backgroundColor: colors.slice(0, initialLabels.length),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '55%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: { callbacks: { label: function(ctx) { return ctx.label + ' : ' + ctx.parsed.toFixed(2) + ' €'; } } }
+                }
+            }
+        });
+
+        var btnFiltrer = document.getElementById('btn-filtrer-stats');
+        if (btnFiltrer) {
+            btnFiltrer.onclick = async function() {
+                var menu = document.getElementById('filtre-menu').value;
+                var debut = document.getElementById('filtre-debut').value;
+                var fin = document.getElementById('filtre-fin').value;
+
+                var params = new URLSearchParams();
+                if (menu) params.set('menu', menu);
+                if (debut) params.set('debut', debut);
+                if (fin) params.set('fin', fin);
+
+                var response = await fetch('{{ path("app_admin_stats_api") }}?' + params.toString());
+                var data = await response.json();
+
+                var labels = Object.keys(data.commandesParMenu);
+                var commandes = Object.values(data.commandesParMenu);
+                var ca = Object.values(data.caParMenu);
+
+                window.myChartCommandes.data.labels = labels;
+                window.myChartCommandes.data.datasets[0].data = commandes;
+                window.myChartCommandes.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+                window.myChartCommandes.update();
+
+                window.myChartCA.data.labels = labels;
+                window.myChartCA.data.datasets[0].data = ca;
+                window.myChartCA.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+                window.myChartCA.update();
+
+                document.getElementById('ca-total').textContent =
+                    data.caTotal.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+            };
+        }
+    });
+    </script>
+{% endblock %}

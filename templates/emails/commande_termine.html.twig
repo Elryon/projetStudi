@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande terminée</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f1ec; font-family: Arial, Helvetica, sans-serif; color: #3a2e28;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f1ec; padding: 32px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+
+                    <tr>
+                        <td style="background-color: #691b37; padding: 32px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 22px;">Commande livrée !</h1>
+                            <p style="margin: 8px 0 0; color: #f4d9c6; font-size: 14px;">Vite &amp; Gourmand</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6;">
+                                Bonjour {{ commande.user.prenom }},
+                            </p>
+
+                            <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6;">
+                                Nous vous informons que votre commande <a href="{{ url('app_detail_commande', {id: commande.id}) }}" style="color: #691b37; text-decoration: underline;">#{{ commande.id }}</a> a été annulée par notre équipe.
+                            </p>
+
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td style="border-radius: 4px; background-color: #691b37;">
+                                        <a href="{{ url('app_detail_commande', {id: commande.id}) }}"
+                                           style="display: inline-block; padding: 12px 24px; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 4px;">
+                                            Laisser un avis
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0 0 24px; font-size: 14px; line-height: 1.6; color: #8a7d74;">
+                                En cas d'erreur, n'hésitez pas à nous contacter.
+                            </p>
+
+                            <p style="margin: 0; font-size: 15px; line-height: 1.6;">
+                                En espérant que la prestation vous aura plu,<br>
+                                <strong>L'équipe Vite &amp; Gourmand</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

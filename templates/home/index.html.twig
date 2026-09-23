@@ -1,21 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Accueil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <section class="presentation-section rounded shadow-sm m-0 mt-4 mb-5" style="background-image: url('{{ asset('imgs/picnic_nappe.jpg') }}');">
+        <div class="container-fluid py-4">
+            <div class="row align-items-center">
+                <div class="col-12 col-xl-6 offset-xl-6">
+                    <div class="presentation-content bg-white bg-opacity-50 rounded shadow-sm p-4 p-md-5">
+                        <h2 class="fw-bold mb-2" style="color: var(--primary, #691b37);">Présentation de l'entreprise</h2>
+                        <p class="fst-italic text-muted mb-3">Le savoir-faire d'une équipe passionnée, à votre service</p>
+                        <p class="mb-0 lh-lg">
+                            Depuis 25 ans à Bordeaux, <strong>Julie</strong>, <strong>José</strong>, et leur <strong>équipe</strong> mettent leur expertise et leur passion
+                            au service de vos événements. Repas de famille, célébrations de Noël ou de Pâques, réceptions professionnelles :
+                            « Vite &amp; Gourmand » compose pour chaque occasion des menus soignés, pensés et renouvelés au fil des saisons.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <button type="button" class="btn btn-primary">Primary</button>
-    <ul>
-        <li>Your controller at <code>C:/laragon/www/studi/ecf/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>C:/laragon/www/studi/ecf/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+    <div class="row m-0 mt-4">
+        {% for avis in avis %}
+            <div class="col-12 col-xl-6">
+                <div class="nappe-border h-100{% if avis.commande.menu.regime %} regime-{{ avis.commande.menu.regime.value|lower }}{% endif %}">
+                    <div class="menu-inner">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ avis.commande.user.prenom }} {{ avis.commande.user.nom }}</h6>
+                                <p class="small text-muted mb-0">
+                                    {{ avis.commande.menu.titre }} — {{ avis.commande.dateCommande|date('d/m/Y') }}
+                                </p>
+                            </div>
+                            <span class="text-warning fs-6">
+                                {% for i in 1..5 %}
+                                    {% if i <= avis.note %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <p class="mb-0 small fst-italic text-muted">« {{ avis.contenu }} »</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

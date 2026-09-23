@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Validator as AppAssert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -63,18 +64,14 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ]
             ])
-            ->add('ville', TextType::class, [
-                'required' => false,
-                'trim' => true,
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez renseigner votre ville.']),
-                ]
-            ])
             ->add('adresse', TextType::class, [
                 'required' => false,
                 'trim' => true,
+                'label' => 'Adresse complète',
+                'help' => 'Indiquez votre adresse avec la ville (ex: 10 rue de Rivoli, Paris)',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez renseigner votre adresse.']),
+                    new AppAssert\AdresseValide(),
                 ]
             ]);
 

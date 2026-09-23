@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+    <div class="page-header">
+        <h1>Mentions légales</h1>
+        <span class="divider"></span>
+    </div>
+
+    <div class="container pb-5" style="max-width: 800px;">
+
+        <div class="card p-4 p-md-5">
+
+            <h2 class="h5">Éditeur du site</h2>
+            <p>
+                Le présent site est édité par <strong>Vite &amp; Gourmand</strong>, entreprise individuelle exploitée par Julie et José,
+                dont le siège d'activité est situé à Bordeaux (33000), France.
+            </p>
+            <ul>
+                <li>Forme juridique : [à compléter — ex. entreprise individuelle / EIRL / SASU]</li>
+                <li>SIRET : [à compléter]</li>
+                <li>N° TVA intracommunautaire : [à compléter le cas échéant]</li>
+                <li>Adresse : [adresse complète à compléter]</li>
+                <li>Téléphone : [à compléter]</li>
+                <li>Email : contact@vitegourmand.fr</li>
+                <li>Directeur de la publication : Julie / José</li>
+            </ul>
+
+            <h2 class="h5 mt-4">Hébergement</h2>
+            <p>
+                Le site est hébergé par : [nom de l'hébergeur, ex. OVH SAS]<br>
+                [Adresse de l'hébergeur]<br>
+                [Téléphone de l'hébergeur]
+            </p>
+
+            <h2 class="h5 mt-4">Propriété intellectuelle</h2>
+            <p>
+                L'ensemble des contenus présents sur ce site (textes, images, logos, mise en page, recettes, photographies) est protégé
+                par le droit d'auteur et reste la propriété exclusive de Vite &amp; Gourmand, sauf mention contraire. Toute reproduction,
+                représentation, modification ou exploitation, totale ou partielle, sans autorisation préalable écrite est interdite et
+                pourrait constituer une contrefaçon au sens des articles L.335-2 et suivants du Code de la propriété intellectuelle.
+            </p>
+
+            <h2 class="h5 mt-4">Données personnelles</h2>
+            <p>
+                Les informations recueillies via le site (formulaire de contact, création de compte, commandes) font l'objet d'un traitement
+                destiné à la gestion de la relation client et au bon fonctionnement du service. Conformément au Règlement Général sur la
+                Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification,
+                de suppression et d'opposition aux données vous concernant, que vous pouvez exercer en nous contactant à l'adresse
+                contact@vitegourmand.fr.
+            </p>
+
+            <h2 class="h5 mt-4">Cookies</h2>
+            <p>
+                Le site peut utiliser des cookies techniques nécessaires à son bon fonctionnement (maintien de la session utilisateur,
+                sécurité). Aucun cookie de tracking publicitaire n'est utilisé sans consentement préalable.
+            </p>
+
+            <h2 class="h5 mt-4">Limitation de responsabilité</h2>
+            <p>
+                Vite &amp; Gourmand s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site, mais ne
+                saurait être tenue responsable des erreurs, omissions ou de l'indisponibilité temporaire du site.
+            </p>
+
+            <h2 class="h5 mt-4">Contact</h2>
+            <p>
+                Pour toute question relative au site ou à ces mentions légales, vous pouvez nous contacter via notre
+                <a href="{{ path('app_contact') }}">formulaire de contact</a>.
+            </p>
+
+        </div>
+    </div>
+{% endblock %}

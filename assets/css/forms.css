@@ -1,0 +1,187 @@
+/* ===== Carte type "connexion" — base commune à tous les formulaires ===== */
+.auth-wrapper {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+}
+
+/* Variantes de largeur pour les formulaires plus longs */
+.auth-card.auth-card-md { max-width: 640px; }
+.auth-card.auth-card-lg { max-width: 780px; }
+
+.auth-card h1 {
+    font-weight: 700;
+    color: var(--primary, #691b37);
+    text-align: center;
+    margin-bottom: 1.75rem;
+    font-size: 1.5rem;
+}
+
+.auth-card .card-subtitle {
+    text-align: center;
+    color: #8a7d74;
+    margin-top: -1rem;
+    margin-bottom: 1.75rem;
+    font-size: 0.92rem;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+}
+
+.auth-links a {
+    color: var(--primary, #691b37);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.auth-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #8a7d74;
+    font-size: 0.85rem;
+    margin: 1.25rem 0;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e8e0d8;
+}
+
+.auth-separator:not(:empty)::before { margin-right: 0.75em; }
+.auth-separator:not(:empty)::after { margin-left: 0.75em; }
+
+/* Empilement de plusieurs cartes (ex: formulaire + récapitulatif de commande) */
+.form-stack {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-stack .auth-card {
+    max-width: none;
+}
+
+/* ===== Titres de section à l'intérieur d'un formulaire ===== */
+.form-section-title {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: #8a7d74;
+    border-bottom: 1px solid #e8e0d8;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ===== Champs de formulaire (identiques à la page de connexion) ===== */
+.app-form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #3a2e28;
+    margin-bottom: 0.4rem;
+}
+
+.app-form .form-control,
+.app-form .form-select {
+    border: 1px solid #e0d5c8;
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    background-color: #fdfbf8;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.app-form .form-control:focus,
+.app-form .form-select:focus {
+    border-color: var(--primary, #691b37);
+    box-shadow: 0 0 0 0.2rem rgba(105, 27, 55, 0.12);
+    background-color: #ffffff;
+}
+
+.app-form textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.app-form .form-check-input {
+    width: 1.15em;
+    height: 1.15em;
+    border-color: #d8c9b8;
+}
+
+.app-form .form-check-input:checked {
+    background-color: var(--primary, #691b37);
+    border-color: var(--primary, #691b37);
+}
+
+.app-form .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(105, 27, 55, 0.12);
+}
+
+.app-form .form-text {
+    font-size: 0.82rem;
+    color: #8a7d74;
+}
+
+.app-form .mb-3 {
+    margin-bottom: 1.4rem !important;
+}
+
+.app-form .invalid-feedback {
+    font-size: 0.82rem;
+}
+
+.app-form .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.65rem 1.5rem;
+}
+
+.app-form .btn-lg {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* ===== Photo actuelle (plats) ===== */
+.current-photo {
+    max-width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* ===== Variantes de largeur pour .auth-card (formulaires plus riches) ===== */
+.auth-card--md {
+    max-width: 640px;
+}
+
+.auth-card--lg {
+    max-width: 800px;
+}
+
+.auth-wrapper--top {
+    align-items: flex-start;
+    padding-top: 2.5rem;
+}

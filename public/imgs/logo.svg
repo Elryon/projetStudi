@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Vichy / gingham check pattern, crossings in #691b37 -->
+    <pattern id="vichy" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#fbf3e7"/>
+      <rect x="0" y="0" width="24" height="48" fill="#691b37" opacity="0.55"/>
+      <rect x="0" y="0" width="48" height="24" fill="#691b37" opacity="0.55"/>
+    </pattern>
+
+    <linearGradient id="basketShade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c9975f"/>
+      <stop offset="100%" stop-color="#a3713f"/>
+    </linearGradient>
+
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="256"/>
+    </clipPath>
+  </defs>
+
+  <!-- Round green background -->
+  <circle cx="256" cy="256" r="256" fill="#2e7d32"/>
+
+  <!-- Vichy nappe: enlarged diamond so its four corners overflow the circle -->
+  <g transform="translate(256,256) rotate(45)">
+    <rect x="-220" y="-220" width="440" height="440" rx="10" fill="url(#vichy)" stroke="#5a1530" stroke-width="4"/>
+  </g>
+
+  <!-- Basket clipped to the circle so it stays on the badge -->
+  <g clip-path="url(#circleClip)">
+    <g transform="translate(256,256) scale(2.1)">
+      <!-- handle -->
+      <path d="M -46 -18 C -46 -70 46 -70 46 -18" fill="none" stroke="#7a4f2a" stroke-width="10" stroke-linecap="round"/>
+
+      <!-- basket body -->
+      <path d="M -70 -10 L 70 -10 L 58 62 Q 0 78 -58 62 Z" fill="url(#basketShade)" stroke="#7a4f2a" stroke-width="4" stroke-linejoin="round"/>
+
+      <!-- woven texture: verticals -->
+      <g stroke="#7a4f2a" stroke-width="3" opacity="0.55">
+        <line x1="-46" y1="-8" x2="-38" y2="60"/>
+        <line x1="-23" y1="-8" x2="-19" y2="66"/>
+        <line x1="0" y1="-8" x2="0" y2="68"/>
+        <line x1="23" y1="-8" x2="19" y2="66"/>
+        <line x1="46" y1="-8" x2="38" y2="60"/>
+      </g>
+      <!-- woven texture: horizontals -->
+      <g stroke="#7a4f2a" stroke-width="3" opacity="0.55">
+        <path d="M -66 8 Q 0 18 66 8" fill="none"/>
+        <path d="M -63 26 Q 0 36 63 26" fill="none"/>
+        <path d="M -60 44 Q 0 54 60 44" fill="none"/>
+      </g>
+
+      <!-- lid flap -->
+      <path d="M -70 -10 Q 0 -34 70 -10 Q 0 4 -70 -10 Z" fill="#b8824f" stroke="#7a4f2a" stroke-width="4" stroke-linejoin="round"/>
+
+      <!-- a little checked cloth peeking out -->
+      <path d="M -18 -26 Q 0 -44 22 -24 L 16 -14 Q 0 -26 -12 -16 Z" fill="url(#vichy)" stroke="#5a1530" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- subtle outer ring -->
+  <circle cx="256" cy="256" r="252" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="4"/>
+</svg>

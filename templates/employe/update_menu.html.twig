@@ -1,25 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier un menu{% endblock %}
+{% block title %}Modifier le menu{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1>Modifier le menu</h1>
+    <div class="auth-wrapper auth-wrapper--top">
+        <div class="auth-card auth-card--lg">
+            <h1>Modifier le menu</h1>
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
 
-        {{ form_start(menuForm) }}
-            {{ form_row(menuForm.titre) }}
-            {{ form_row(menuForm.description) }}
-            {{ form_row(menuForm.prix_personne) }}
-            {{ form_row(menuForm.personne_min) }}
-            {{ form_row(menuForm.quantite_restante) }}
-            {{ form_row(menuForm.regime) }}
-            {{ form_row(menuForm.theme) }}
-            {{ form_row(menuForm.plats) }}
-            <button type="submit" class="btn btn-primary mt-3">Modifier le menu</button>
-        {{ form_end(menuForm) }}
+            {{ form_start(menuForm, {'attr': {'class': 'app-form'}}) }}
+
+                <p class="form-section-title">🍽️ Informations générales</p>
+                <div class="mb-3">
+                    {{ form_row(menuForm.titre, {attr: {'class': 'form-control'}}) }}
+                </div>
+                <div class="mb-4">
+                    {{ form_row(menuForm.description, {attr: {'class': 'form-control'}}) }}
+                </div>
+                <div class="mb-4">
+                    {{ form_row(menuForm.conditions, {attr: {'class': 'form-control'}}) }}
+                </div>
+
+                <p class="form-section-title">💰 Tarification &amp; capacité</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        {{ form_row(menuForm.prix_personne, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_row(menuForm.personne_min, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_row(menuForm.quantite_restante, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+
+                <p class="form-section-title">🏷️ Classification</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        {{ form_row(menuForm.regime, {attr: {'class': 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(menuForm.theme, {attr: {'class': 'form-select'}}) }}
+                    </div>
+                </div>
+
+                <p class="form-section-title">🥘 Composition</p>
+                <div class="mb-4">
+                    {{ form_row(menuForm.plats, {attr: {'class': 'form-select'}}) }}
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Enregistrer les modifications</button>
+                </div>
+
+            {{ form_end(menuForm) }}
+        </div>
     </div>
 {% endblock %}

@@ -2,179 +2,460 @@
 
 {% block title %}Espace employé{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/employe.css') }}">
+{% endblock %}
+
 {% block body %}
-    <div class="container py-4">
+    <div class="page-employe">
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-
-        {# ===== SECTION PLATS ===== #}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Gestion des plats</h1>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePlats" aria-expanded="true" aria-controls="collapsePlats">
-                    Afficher / Masquer
-                </button>
-                <a class="btn btn-success" href="{{ path('app_nouveau_plat') }}">
-                    + Ajouter un plat
-                </a>
-            </div>
+        <div class="page-header">
+            <h1>Espace employé</h1>
+            <p class="subtitle">Gestion des commandes, plats &amp; menus</p>
+            <span class="divider"></span>
         </div>
 
-        <div class="collapse show" id="collapsePlats">
-            {% if plats is empty %}
-                <div class="text-center py-5 text-muted">
-                    <p class="fs-5">Aucun plat pour le moment.</p>
-                    <a href="{{ path('app_nouveau_plat') }}" class="btn btn-outline-success">Créer votre premier plat</a>
-                </div>
-            {% else %}
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    {% for plat in plats %}
-                        <div class="col">
-                            <div class="card h-100 shadow-sm">
-                                {% if plat.photo %}
-                                    <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}" 
-                                        class="card-img-top" 
-                                        alt="Photo de {{ plat.nom }}"
-                                        style="height: 200px; object-fit: cover;">
-                                {% else %}
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                        <span class="text-muted">Pas de photo</span>
-                                    </div>
-                                {% endif %}
+        <div class="container pb-5">
 
-                                <div class="card-body">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# ===== SECTION AVIS ===== #}
+            {% if avisEnAttente is not empty %}
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon icon-jaune">⭐</span>
+                        Avis en attente
+                        <span class="badge-count count-jaune">{{ avisEnAttente|length }}</span>
+                    </h2>
+                    <button class="btn-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAvis" aria-expanded="true">
+                        Afficher / Masquer
+                    </button>
+                </div>
+
+                <div class="collapse show" id="collapseAvis">
+                    <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+                        {% for avis in avisEnAttente %}
+                            <div class="col">
+                                <div class="employe-card h-100">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title mb-0">{{ plat.nom }}</h5>
-                                        {% if plat.disponible %}
-                                            <span class="badge bg-success">Disponible</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Indisponible</span>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ avis.commande.user.prenom }} {{ avis.commande.user.nom }}</h6>
+                                            <p class="small text-muted mb-0">
+                                                {{ avis.commande.menu.titre }} — {{ avis.commande.dateCommande|date('d/m/Y') }}
+                                            </p>
+                                        </div>
+                                        <span class="avis-etoiles">
+                                            {% for i in 1..5 %}
+                                                {% if i <= avis.note %}★{% else %}☆{% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <p class="mb-3 small fst-italic text-muted">« {{ avis.contenu }} »</p>
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <form method="post" action="{{ path('app_valider_avis', {id: avis.id}) }}">
+                                            <input type="hidden" name="action" value="valider">
+                                            <button type="submit" class="btn-employe btn-employe-success">Valider</button>
+                                        </form>
+                                        <form method="post" action="{{ path('app_valider_avis', {id: avis.id}) }}"
+                                            onsubmit="return confirm('Refuser et supprimer cet avis ?')">
+                                            <input type="hidden" name="action" value="refuser">
+                                            <button type="submit" class="btn-employe btn-employe-outline-danger">Refuser</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <hr class="section-separator">
+            {% endif %}
+
+            {# ===== SECTION COMMANDES ===== #}
+            {% set statuts = [
+                {value: 'attente', label: 'En attente'},
+                {value: 'accepte', label: 'Acceptées'},
+                {value: 'preparation', label: 'En préparation'},
+                {value: 'livraison', label: 'En livraison'},
+                {value: 'livre', label: 'Livrées'},
+                {value: 'AttenteRetourMateriel', label: 'Attente retour'},
+                {value: 'termine', label: 'Terminées'},
+                {value: 'annule', label: 'Annulées'},
+            ] %}
+
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-rouge">📋</span>
+                    Gestion des commandes
+                </h2>
+                <button class="btn-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCommandes" aria-expanded="true">
+                    Afficher / Masquer
+                </button>
+            </div>
+
+            <div class="collapse show" id="collapseCommandes">
+
+                <div class="employe-card mb-3 py-3">
+                    <form method="get" action="{{ path('app_employe') }}" class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <input type="text" name="client" class="form-control form-control-sm"
+                                placeholder="Rechercher par nom, prénom ou email..."
+                                value="{{ filtreClient }}">
+                        </div>
+                        <div class="col-md-auto d-flex gap-2">
+                            <button type="submit" class="btn-employe btn-employe-primary">Filtrer</button>
+                            <a href="{{ path('app_employe') }}" class="btn-employe btn-employe-outline">Réinitialiser</a>
+                        </div>
+                    </form>
+                </div>
+
+                <ul class="nav nav-tabs nav-fill employe-tabs mb-3" role="tablist">
+                    {% for statut in statuts %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ loop.first ? 'active' }}"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tab-{{ statut.value }}"
+                                    type="button" role="tab">
+                                {{ statut.label }}
+                                {% set count = commandes|filter(c => c.dernierStatut.statut.value == statut.value)|length %}
+                                {% if count > 0 %}
+                                    <span class="badge-statut statut-{{ statut.value|lower }} ms-1">{{ count }}</span>
+                                {% endif %}
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="tab-content">
+                    {% for statut in statuts %}
+                        <div class="tab-pane fade {{ loop.first ? 'show active' }}" id="tab-{{ statut.value }}" role="tabpanel">
+                            {% set commandesFiltrees = commandes|filter(c => c.dernierStatut.statut.value == statut.value) %}
+
+                            {% if commandesFiltrees|length == 0 %}
+                                <div class="text-center text-muted py-5 fst-italic">Aucune commande avec ce statut.</div>
+                            {% else %}
+                                <div class="employe-card p-0">
+                                    <div class="table-responsive">
+                                        <table class="table-employe mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date commande</th>
+                                                    <th>Date livraison</th>
+                                                    <th>Client</th>
+                                                    <th>Menu</th>
+                                                    <th>Pers.</th>
+                                                    <th>Adresse</th>
+                                                    <th>Prix</th>
+                                                    <th>Matériel</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for commande in commandesFiltrees %}
+                                                    <tr>
+                                                        <td>{{ commande.dateCommande|date('d/m/Y') }}</td>
+                                                        <td>{{ commande.dateLivraison|date('d/m/Y') }}</td>
+                                                        <td class="fw-semibold">{{ commande.user.prenom }} {{ commande.user.nom }}</td>
+                                                        <td>{{ commande.menu.titre }}</td>
+                                                        <td class="text-center">{{ commande.nombrePersonne }}</td>
+                                                        <td class="cell-truncate" title="{{ commande.adresse }}">{{ commande.adresse }}</td>
+                                                        <td class="fw-bold">{{ commande.prixTotal }} €</td>
+                                                        <td>
+                                                            {% if commande.pretMateriel %}
+                                                                <span class="badge-statut {{ commande.materielRendu ? 'statut-livre' : 'statut-attente' }}">
+                                                                    {{ commande.materielRendu ? 'Rendu' : 'Prêté' }}
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="text-muted small">—</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex gap-1">
+                                                                <a href="{{ path('app_detail_commande', {id: commande.id}) }}" class="btn-employe btn-employe-outline btn-employe-xs">Détails</a>
+                                                                {% if statut.value not in ['termine', 'annule'] %}
+                                                                    <form method="post" action="{{ path('app_avancer_commande', {id: commande.id}) }}">
+                                                                        <input type="hidden" name="_token" value="{{ csrf_token('avancer' ~ commande.id) }}">
+                                                                        <button type="submit" class="btn-employe btn-employe-success btn-employe-xs">Avancer</button>
+                                                                    </form>
+                                                                    <button type="button" class="btn-employe btn-employe-outline-danger btn-employe-xs" data-bs-toggle="modal" data-bs-target="#modalAnnuler{{ commande.id }}">Annuler</button>
+                                                                {% endif %}
+                                                            </div>
+
+                                                            {% if statut.value not in ['termine', 'annule'] %}
+                                                                <div class="modal fade" id="modalAnnuler{{ commande.id }}" tabindex="-1">
+                                                                    <div class="modal-dialog">
+                                                                        <div class="modal-content employe-modal">
+                                                                            <form method="post" action="{{ path('app_employe_annuler_commande', {id: commande.id}) }}">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Annuler la commande</h5>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    <div class="modal-client-info mb-3">
+                                                                                        <p class="mb-1 fw-semibold">{{ commande.user.prenom }} {{ commande.user.nom }}</p>
+                                                                                        <p class="small text-muted mb-0">
+                                                                                            {{ commande.menu.titre }} — {{ commande.user.telephone ?? 'Pas de téléphone' }} / {{ commande.user.email }}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <div class="mb-3">
+                                                                                        <label class="form-label">Mode de contact utilisé</label>
+                                                                                        <select name="mode_contact" class="form-select" required>
+                                                                                            <option value="">-- Choisir --</option>
+                                                                                            <option value="telephone">Appel téléphonique</option>
+                                                                                            <option value="email">Email</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="mb-3">
+                                                                                        <label class="form-label">Motif d'annulation</label>
+                                                                                        <textarea name="motif" class="form-control" rows="3" required placeholder="Expliquez la raison..."></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                    <button type="button" class="btn-employe btn-employe-outline" data-bs-dismiss="modal">Fermer</button>
+                                                                                    <button type="submit" class="btn-employe btn-employe-danger">Confirmer l'annulation</button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="section-separator">
+
+            {# ===== SECTION PLATS ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-vert">🥘</span>
+                    Gestion des plats
+                </h2>
+                <div class="d-flex gap-2">
+                    <button class="btn-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePlats" aria-expanded="true">
+                        Afficher / Masquer
+                    </button>
+                    <a class="btn-employe btn-employe-success" href="{{ path('app_nouveau_plat') }}">+ Ajouter</a>
+                </div>
+            </div>
+
+            <div class="collapse show" id="collapsePlats">
+                {% if plats is empty %}
+                    <div class="employe-empty">
+                        <p>Aucun plat pour le moment.</p>
+                        <a href="{{ path('app_nouveau_plat') }}" class="btn-employe btn-employe-outline-success">Créer votre premier plat</a>
+                    </div>
+                {% else %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                        {% for plat in plats %}
+                            <div class="col">
+                                <div class="employe-item-card h-100">
+                                    {% if plat.photo %}
+                                        <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}"
+                                            class="employe-item-img"
+                                            alt="Photo de {{ plat.nom }}">
+                                    {% else %}
+                                        <div class="employe-item-img employe-item-img-empty">
+                                            <span>Pas de photo</span>
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="employe-item-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="employe-item-title">{{ plat.nom }}</h6>
+                                            {% if plat.disponible %}
+                                                <span class="badge-statut statut-livre">Disponible</span>
+                                            {% else %}
+                                                <span class="badge-statut statut-annule">Indisponible</span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="employe-item-meta">
+                                            Allergènes : {{ plat.allergenes ?? 'Aucun' }}
+                                        </p>
+                                    </div>
+
+                                    <div class="employe-item-footer">
+                                        <a href="{{ path('app_update_plat', {id: plat.id}) }}" class="btn-employe btn-employe-outline btn-employe-xs">Modifier</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <hr class="section-separator">
+
+            {# ===== SECTION MENUS ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-bleu">🍽️</span>
+                    Gestion des menus
+                </h2>
+                <div class="d-flex gap-2">
+                    <button class="btn-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMenus" aria-expanded="true">
+                        Afficher / Masquer
+                    </button>
+                    <a class="btn-employe btn-employe-success" href="{{ path('app_nouveau_menu') }}">+ Ajouter</a>
+                </div>
+            </div>
+
+            <div class="collapse show" id="collapseMenus">
+                {% if menus is empty %}
+                    <div class="employe-empty">
+                        <p>Aucun menu pour le moment.</p>
+                        <a href="{{ path('app_nouveau_menu') }}" class="btn-employe btn-employe-outline-success">Créer votre premier menu</a>
+                    </div>
+                {% else %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                        {% for menu in menus %}
+                            <div class="col">
+                                <div class="employe-item-card h-100">
+                                    <div class="employe-item-body">
+                                        <h6 class="employe-item-title mb-2">{{ menu.titre }}</h6>
+                                        <p class="employe-item-meta employe-clamp">Description : {{ menu.description }}</p>
+                                        <p class="employe-item-meta employe-clamp">Conditions : {{ menu.conditions }}</p>
+
+                                        <div class="d-flex gap-3 employe-item-meta mb-2">
+                                            <span><strong>{{ menu.prixPersonne }} €</strong>/pers.</span>
+                                            <span>Min. <strong>{{ menu.personneMin }}</strong> pers.</span>
+                                            <span>Qté: <strong>{{ menu.quantiteRestante }}</strong></span>
+                                        </div>
+
+                                        <div class="d-flex gap-1 flex-wrap mb-2">
+                                            {% if menu.regime %}
+                                                <span class="badge-pill regime-{{ menu.regime.value|lower }}">{{ menu.regime.getLabel }}</span>
+                                            {% endif %}
+                                            {% if menu.theme %}
+                                                <span class="badge-pill pill-theme">{{ menu.theme.theme }}</span>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if menu.plats is not empty %}
+                                            <p class="employe-item-meta mb-0">
+                                                <strong>Plats :</strong>
+                                                {% for plat in menu.plats %}
+                                                    {{ plat.nom }}{% if not loop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </p>
                                         {% endif %}
                                     </div>
 
-                                    {% if plat.allergenes %}
-                                        <p class="text-muted small mb-0">
-                                            Allergènes : {{ plat.allergenes }}
-                                        </p>
-                                    {% else %}
-                                        <p class="text-muted small mb-0">Aucun allergène</p>
-                                    {% endif %}
-                                </div>
-
-                                <div class="card-footer bg-transparent border-top-0 text-end">
-                                    <a href="{{ path('app_update_plat', {id: plat.id}) }}" class="btn btn-outline-primary btn-sm">
-                                        Modifier
-                                    </a>
+                                    <div class="employe-item-footer">
+                                        <a href="{{ path('app_update_menu', {id: menu.id}) }}" class="btn-employe btn-employe-outline btn-employe-xs">Modifier</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-        <hr class="my-5">
-
-        {# ===== SECTION MENUS ===== #}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Gestion des menus</h1>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMenus" aria-expanded="true" aria-controls="collapseMenus">
-                    Afficher / Masquer
-                </button>
-                <a class="btn btn-success" href="{{ path('app_nouveau_menu') }}">
-                    + Ajouter un menu
-                </a>
-            </div>
-        </div>
-
-        <div class="collapse show" id="collapseMenus">
-            {% if menus is empty %}
-                <div class="text-center py-5 text-muted">
-                    <p class="fs-5">Aucun menu pour le moment.</p>
-                    <a href="{{ path('app_nouveau_menu') }}" class="btn btn-outline-success">Créer votre premier menu</a>
-                </div>
-            {% else %}
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    {% for menu in menus %}
-                        <div class="col">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ menu.titre }}</h5>
-                                    <p class="text-muted small">{{ menu.description }}</p>
-
-                                    <ul class="list-unstyled small mb-2">
-                                        <li><strong>Prix :</strong> {{ menu.prixPersonne }} € / pers.</li>
-                                        <li><strong>Min. personnes :</strong> {{ menu.personneMin }}</li>
-                                        <li><strong>Quantité restante :</strong> {{ menu.quantiteRestante }}</li>
-                                    </ul>
-
-                                    {% if menu.regime %}
-                                        <span class="badge bg-info text-dark">{{ menu.regime.nom }}</span>
-                                    {% endif %}
-                                    {% if menu.theme %}
-                                        <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
-                                    {% endif %}
-
-                                    {% if menu.plats is not empty %}
-                                        <p class="mt-2 mb-0 small"><strong>Plats :</strong>
-                                            {% for plat in menu.plats %}
-                                                {{ plat.nom }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-                                </div>
-
-                                <div class="card-footer bg-transparent border-top-0 text-end">
-                                    <a href="{{ path('app_update_menu', {id: menu.id}) }}" class="btn btn-outline-primary btn-sm">
-                                        Modifier
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-        <hr class="my-5">
-
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Régimes</h4>
-                {{ form_start(regimeForm) }}
-                    <div class="input-group mb-3">
-                        {{ form_widget(regimeForm.nom, {attr: {class: 'form-control'}}) }}
-                        <button type="submit" class="btn btn-success">Ajouter</button>
+                        {% endfor %}
                     </div>
-                {{ form_end(regimeForm) }}
-                {% for regime in regimes %}
-                    <span class="badge bg-info text-dark me-1">
-                        {{ regime.nom }}
-                    </span>
-                {% endfor %}
+                {% endif %}
             </div>
 
-            <div class="col-md-6">
-                <h4>Thèmes</h4>
-                {{ form_start(themeForm) }}
-                    <div class="input-group mb-3">
-                        {{ form_widget(themeForm.theme, {attr: {class: 'form-control'}}) }}
-                        <button type="submit" class="btn btn-success">Ajouter</button>
+            <hr class="section-separator">
+
+            {# ===== SECTION THÈMES ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-gris">🏷️</span>
+                    Thèmes
+                </h2>
+            </div>
+
+            <div class="employe-card">
+                {{ form_start(themeForm, {'attr': {'class': 'app-form'}}) }}
+                    <div class="input-group input-group-sm mb-3">
+                        {{ form_widget(themeForm.theme, {attr: {class: 'form-control', placeholder: 'Nom du nouveau thème...'}}) }}
+                        <button type="submit" class="btn-employe btn-employe-success">Ajouter</button>
                     </div>
                 {{ form_end(themeForm) }}
-                {% for theme in themes %}
-                    <span class="badge bg-secondary me-1">
-                        {{ theme.theme }}
-                    </span>
-                {% endfor %}
+                <div class="d-flex gap-2 flex-wrap">
+                    {% for theme in themes %}
+                        <span class="theme-pill">{{ theme.theme }}</span>
+                    {% endfor %}
+                    {% if themes is empty %}
+                        <span class="text-muted fst-italic small">Aucun thème.</span>
+                    {% endif %}
+                </div>
             </div>
-        </div>
 
+            <hr class="section-separator">
+
+            {# ===== SECTION HORAIRES ===== #}
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon icon-jaune">🕒</span>
+                    Horaires d'ouverture
+                </h2>
+                <button class="btn-employe btn-employe-outline" type="button" data-bs-toggle="modal" data-bs-target="#modalHoraires">
+                    Modifier les horaires
+                </button>
+            </div>
+
+            <div class="employe-card">
+                <div class="row row-cols-1 row-cols-lg-7 g-2 g-lg-3">
+                    {% for jour, label in {
+                        lundi: 'Lundi', mardi: 'Mardi', mercredi: 'Mercredi', jeudi: 'Jeudi',
+                        vendredi: 'Vendredi', samedi: 'Samedi', dimanche: 'Dimanche'
+                    } %}
+                        <div class="col">
+                            <div class="d-flex justify-content-between align-items-center d-lg-block py-1 border-bottom border-lg-0">
+                                <span class="fw-semibold small d-lg-block">{{ label }}</span>
+                                <span class="small text-muted d-lg-block">{{ attribute(horairesForm.vars.data, jour) }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Modal formulaire horaires #}
+            <div class="modal fade" id="modalHoraires" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content employe-modal">
+                        {{ form_start(horairesForm, {'attr': {'class': 'app-form'}}) }}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Modifier les horaires d'ouverture</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% for field in horairesForm %}
+                                    <div class="mb-3">
+                                        {{ form_label(field) }}
+                                        {{ form_widget(field, {attr: {class: 'form-control'}}) }}
+                                        {{ form_errors(field) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-employe btn-employe-outline" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn-employe btn-employe-success">Enregistrer</button>
+                            </div>
+                        {{ form_end(horairesForm) }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 {% endblock %}

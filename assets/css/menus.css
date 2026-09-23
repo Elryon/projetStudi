@@ -1,0 +1,300 @@
+/* ══════════════════════════════════════
+   MENUS PAGE — Styles spécifiques
+   ══════════════════════════════════════ */
+
+/* ── Sidebar filtres ── */
+.filtre-card {
+    background: var(--blanc);
+    border: 1px solid var(--gris-clair);
+    border-radius: var(--radius);
+    box-shadow: var(--ombre-douce);
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+}
+.filtre-card h5 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--brun-doux);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.filtre-card h5::before {
+    content: '⚙';
+    font-size: 1rem;
+}
+
+.btn-reset {
+    background: transparent;
+    border: 2px solid var(--gris-clair);
+    border-radius: 8px;
+    color: var(--brun-clair);
+    font-weight: 600;
+    font-size: .85rem;
+    padding: .55rem 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all .2s;
+}
+.btn-reset:hover {
+    border-color: var(--rouge-nappe);
+    color: var(--rouge-nappe);
+    background: rgba(192, 57, 43, .04);
+}
+
+.menu-inner .card-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--brun-doux);
+    margin-bottom: .4rem;
+}
+.menu-inner .card-desc {
+    font-size: .85rem;
+    color: var(--gris-texte);
+    line-height: 1.5;
+    margin-bottom: .85rem;
+    flex-grow: 1;
+}
+
+/* ── Méta (prix, personnes) ── */
+.menu-meta {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-bottom: .75rem;
+}
+.menu-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .82rem;
+    color: var(--brun-clair);
+}
+.menu-meta .meta-item .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    flex-shrink: 0;
+}
+.meta-prix .icon    { background: var(--jaune-badge); }
+.meta-personnes .icon { background: var(--bleu-badge); }
+.meta-item strong {
+    color: var(--brun-doux);
+    font-weight: 600;
+}
+
+/* ── Ligne de badges ── */
+.badge-row {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin-bottom: .85rem;
+    align-items: center;
+}
+.badge-labeled {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .8rem;
+}
+.badge-label {
+    font-weight: 600;
+    color: var(--brun-clair);
+    white-space: nowrap;
+}
+
+/* ── Footer card / bouton détails ── */
+.menu-footer {
+    border-top: 1px solid var(--gris-clair);
+    padding-top: .85rem;
+    text-align: right;
+}
+.btn-details {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: transparent;
+    border: 2px solid var(--rouge-nappe);
+    color: var(--rouge-nappe);
+    font-weight: 600;
+    font-size: .82rem;
+    padding: .45rem 1.1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all .25s;
+}
+.btn-details:hover {
+    background: var(--rouge-nappe);
+    color: var(--blanc);
+    transform: translateX(2px);
+}
+.btn-details .arrow { transition: transform .25s; }
+.btn-details:hover .arrow { transform: translateX(3px); }
+
+/* ── État vide ── */
+.empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+.empty-state .icon-empty {
+    font-size: 3rem;
+    margin-bottom: .75rem;
+}
+.empty-state p {
+    color: var(--brun-clair);
+    font-size: 1.05rem;
+}
+#aucun-resultat {
+    color: var(--brun-clair);
+    font-style: italic;
+}
+
+/* ── Animation d'entrée des cards ── */
+.menu-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp .5s ease forwards;
+}
+
+/* ── Responsive ── */
+@media (max-width: 991px) {
+    .filtre-card { position: static; }
+}
+
+
+/* ══════════════════════════════════════
+   DÉTAIL MENU — Styles spécifiques
+   ══════════════════════════════════════ */
+
+.menu-detail-inner {
+    padding: 2rem;
+}
+
+.menu-detail-desc {
+    font-size: .98rem;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+}
+
+.menu-detail-meta {
+    font-size: .95rem;
+}
+
+.menu-detail-meta .icon {
+    width: 34px;
+    height: 34px;
+}
+
+/* ── Encart conditions ── */
+.conditions-callout {
+    background: #fdf1e6;
+    border-left: 3px solid #9f4500;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+
+.conditions-label {
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #9f4500;
+    margin-bottom: .35rem;
+}
+
+/* ── Titre section plats ── */
+.plats-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--brun-doux);
+}
+
+.plats-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 .4rem;
+    margin-left: .6rem;
+    border-radius: 999px;
+    background: var(--rouge-nappe);
+    color: var(--blanc);
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+/* ── Cards plats ── */
+.plat-card {
+    background: var(--blanc);
+    border: 1px solid var(--gris-clair);
+    border-radius: var(--radius);
+    box-shadow: var(--ombre-douce);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .25s, box-shadow .25s;
+}
+
+.plat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
+}
+
+.plat-card-img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+}
+
+.plat-card-img-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gris-clair);
+    color: var(--brun-clair);
+    font-size: .85rem;
+}
+
+.plat-card-body {
+    padding: 1.1rem 1.25rem;
+    flex-grow: 1;
+}
+
+.plat-card-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--brun-doux);
+}
+
+.plat-allergenes {
+    font-size: .82rem;
+    color: #b45309;
+    margin-bottom: 0;
+}
+
+.plat-allergenes-none {
+    color: var(--brun-clair);
+}
+
+/* ── Badges disponibilité (même logique que badge-pill régime) ── */
+.badge-dispo {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-indispo {
+    background: #fbe9e7;
+    color: #c0392b;
+}

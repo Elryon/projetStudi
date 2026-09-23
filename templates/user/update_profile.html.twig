@@ -1,23 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon profil{% endblock %}
+{% block title %}Mettre à jour mon profil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1>Mon profil</h1>
+    <div class="auth-wrapper auth-wrapper--top">
+        <div class="auth-card auth-card--md">
+            <h1>Mettre à jour mon profil</h1>
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
 
-        {{ form_start(registrationForm) }}
-            {{ form_row(registrationForm.nom) }}
-            {{ form_row(registrationForm.prenom) }}
-            {{ form_row(registrationForm.email) }}
-            {{ form_row(registrationForm.telephone) }}
-            {{ form_row(registrationForm.ville) }}
-            {{ form_row(registrationForm.adresse) }}
-            {{ form_row(registrationForm.submit) }}
-        {{ form_end(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'class': 'app-form'}}) }}
+
+                <p class="form-section-title">👤 Informations personnelles</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.prenom, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.nom, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+
+                <p class="form-section-title mt-4">📞 Coordonnées</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.email, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.telephone, {attr: {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    {{ form_row(registrationForm.adresse, {attr: {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="d-grid">
+                    {{ form_widget(registrationForm.submit, {'attr': {'class': 'btn btn-primary btn-lg'}}) }}
+                </div>
+
+            {{ form_end(registrationForm) }}
+        </div>
     </div>
 {% endblock %}

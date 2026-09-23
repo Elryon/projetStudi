@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="auth-wrapper auth-wrapper--top">
+        <div class="auth-card auth-card--md">
+            <h1>Nous contacter</h1>
+            <p class="text-muted text-center mb-4" style="margin-top: -1rem;">
+                Une question, une envie particulière ? Notre équipe vous répond rapidement.
+            </p>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {{ form_start(contactForm, {'attr': {'class': 'app-form'}}) }}
+                {{ form_row(contactForm.titre, {
+                    label: 'Titre',
+                    attr: {'class': 'form-control', 'placeholder': 'Objet de votre message'}
+                }) }}
+                {{ form_row(contactForm.description, {
+                    label: 'Votre message',
+                    attr: {'class': 'form-control', 'rows': 6, 'placeholder': 'Décrivez votre demande...'}
+                }) }}
+                {{ form_row(contactForm.email, {
+                    label: 'Votre email',
+                    help: 'Nous vous répondrons à cette adresse.',
+                    attr: {'class': 'form-control', 'placeholder': 'exemple@email.fr'}
+                }) }}
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">
+                    Envoyer le message
+                </button>
+            {{ form_end(contactForm) }}
+        </div>
+    </div>
+{% endblock %}

@@ -2,73 +2,106 @@
 
 {% block title %}{{ menu.titre }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/menus.css') }}">
+{% endblock %}
+
 {% block body %}
-    <div class="container py-4">
+    <div class="page-menus">
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <h1 class="h3">{{ menu.titre }}</h1>
-                </div>
-
-                <p class="text-muted">{{ menu.description }}</p>
-
-                <div class="row mb-3">
-                    <div class="col-sm-4">
-                        <strong>Prix par personne :</strong> {{ menu.prixPersonne }} €
-                    </div>
-                    <div class="col-sm-4">
-                        <strong>Min. personnes :</strong> {{ menu.personneMin }}
-                    </div>
-                </div>
-
-                {% if menu.regime %}
-                    <span class="badge bg-info text-dark me-1">{{ menu.regime.nom }}</span>
-                {% endif %}
-                {% if menu.theme %}
-                    <span class="badge bg-secondary">{{ menu.theme.theme }}</span>
-                {% endif %}
-            </div>
+        <div class="page-header">
+            <h1>{{ menu.titre }}</h1>
+            {% if menu.theme %}
+                <p class="subtitle">{{ menu.theme.theme }}</p>
+            {% endif %}
+            <span class="divider"></span>
         </div>
 
-        <h2 class="h4 mb-3">Plats du menu ({{ menu.plats|length }})</h2>
+        <div class="container pb-5" style="max-width: 1000px;">
 
-        
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for plat in menu.plats %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        {% if plat.photo %}
-                            <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}" 
-                                class="card-img-top" 
-                                alt="Photo de {{ plat.nom }}"
-                                style="height: 200px; object-fit: cover;">
-                        {% else %}
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <span class="text-muted">Pas de photo</span>
-                            </div>
+            {# ===== HERO MENU ===== #}
+            <div class="nappe-border{% if menu.regime %} regime-{{ menu.regime.value|lower }}{% endif %} mb-5">
+                <div class="menu-inner menu-detail-inner">
+
+                    <div class="badge-row mb-3">
+                        {% if menu.regime %}
+                            <span class="badge-pill regime-{{ menu.regime.value|lower }}">{{ menu.regime.getLabel }}</span>
                         {% endif %}
+                        {% if menu.theme %}
+                            <span class="badge-pill pill-theme">{{ menu.theme.theme }}</span>
+                        {% endif %}
+                    </div>
 
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">{{ plat.nom }}</h5>
-                                {% if plat.disponible %}
-                                    <span class="badge bg-success">Disponible</span>
+                    <p class="card-desc menu-detail-desc">{{ menu.description }}</p>
+
+                    <div class="menu-meta menu-detail-meta">
+                        <span class="meta-item meta-prix">
+                            <span class="icon">💰</span>
+                            <span><strong>{{ menu.prixPersonne }} €</strong> / pers.</span>
+                        </span>
+                        <span class="meta-item meta-personnes">
+                            <span class="icon">👥</span>
+                            <span>Min. <strong>{{ menu.personneMin }}</strong> pers.</span>
+                        </span>
+                    </div>
+
+                    {% if menu.conditions %}
+                        <div class="conditions-callout mt-3">
+                            <p class="conditions-label">Conditions</p>
+                            <p class="mb-0">{{ menu.conditions }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="menu-footer mt-4">
+                        <a href="{{ path('app_nouvelle_commande', {menu: menu.id}) }}" class="btn btn-{% if menu.regime.value|lower == 'vegetarien' %}success{% elseif menu.regime.value|lower == 'poisson' %}info{% elseif menu.regime.value|lower == 'vegan' %}warning{% else %}primary{% endif %} btn-lg">
+                            Commander <span class="arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# ===== PLATS ===== #}
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="plats-title mb-0">Plats du menu</h2>
+                <span class="plats-count">{{ menu.plats|length }}</span>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for plat in menu.plats %}
+                    <div class="col">
+                        <div class="plat-card h-100">
+                            {% if plat.photo %}
+                                <img src="{{ asset('imgs/photoPlats/' ~ plat.photo) }}"
+                                    class="plat-card-img"
+                                    alt="Photo de {{ plat.nom }}">
+                            {% else %}
+                                <div class="plat-card-img plat-card-img-empty">
+                                    <span>Pas de photo</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="plat-card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="plat-card-title mb-0">{{ plat.nom }}</h5>
+                                    {% if plat.disponible %}
+                                        <span class="badge-pill badge-dispo">Disponible</span>
+                                    {% else %}
+                                        <span class="badge-pill badge-indispo">Indisponible</span>
+                                    {% endif %}
+                                </div>
+
+                                {% if plat.allergenes %}
+                                    <p class="plat-allergenes">⚠ {{ plat.allergenes }}</p>
                                 {% else %}
-                                    <span class="badge bg-danger">Indisponible</span>
+                                    <p class="plat-allergenes plat-allergenes-none">Aucun allergène</p>
                                 {% endif %}
                             </div>
-
-                            {% if plat.allergenes %}
-                                <p class="text-muted small mb-0">Allergènes : {{ plat.allergenes }}</p>
-                            {% else %}
-                                <p class="text-muted small mb-0">Aucun allergène</p>
-                            {% endif %}
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
 
+        </div>
     </div>
 {% endblock %}

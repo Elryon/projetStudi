@@ -1,5 +1,6 @@
 import './bootstrap.js';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 /*
  * Welcome to your app's main JavaScript file!
  *
